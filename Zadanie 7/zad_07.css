@@ -1,0 +1,14 @@
+.A{
+  position: relative;
+  left:30px;
+}
+
+.B{
+  position: relative;
+  bottom:30px;
+  left:30px;
+}
+
+.C{
+  line-height:1em;
+}
