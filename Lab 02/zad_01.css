@@ -1,0 +1,35 @@
+.center {
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.absize {
+  position: absolute;
+  width: 40%;
+  height: 25%;
+}
+.A {
+  position: absolute;
+  width: 40%;
+  height: 25%;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  background-color: yellow;
+  border: 2px solid red;
+}
+.B {
+  position: absolute;
+  width: 40%;
+  height: 25%;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  top: 62%;
+  left: 70%;
+  background-color: white;
+  border: 2px solid blue;
+}
