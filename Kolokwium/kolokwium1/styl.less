@@ -1,0 +1,64 @@
+// out: styl.css, compress: true
+@bgLSil: rgb(238, 238, 238);
+body{
+    display:flex;
+    #zawodnicy{
+        justify-content: left;
+        background-color:@bgLSil;
+        border: 2px gray outset;
+            ul{
+                list-style-type: none;
+                padding: 15px 30px;
+                text-align:right;
+                .yellow{
+                    background-color: yellow;
+                }
+                }
+            
+    }
+    #pojemnik{
+        display:flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 0 auto;
+        width:280px;
+        #zawodnik{
+            background-color:lightblue;
+            width:100%;
+            padding: 20px 0;
+            text-align:center;
+            border: 1px black solid;
+        }
+        #wyniki{
+        width:100%;
+        display:flex;
+        flex-direction: column;
+        background-color: silver;
+        padding: 20px 0;
+        margin: 5px auto;
+        border: 1px black solid;
+        span{
+            margin: 0 auto;
+            input{
+                width:30px;
+                border: 1px black solid;
+                background-color:@bgLSil;
+                padding: 3px;
+                margin: 2px;
+            }
+        }
+        #pWynik{
+            margin: 15px auto 0px auto;
+            padding: 5px 10px;
+            color: darkred;
+            border: 1px black solid;
+            background-color:@bgLSil;
+            font-size: large;
+            font-weight:bold;
+        }
+        }
+        #zapisz{
+        margin: 0 auto;
+        }
+    }
+}
