@@ -18,10 +18,15 @@ document.onreadystatechange = () => {
         status.textContent = 'Brak połącznia';
         close.disabled = true;
         send.disabled = true;
+        nickname.disabled = true;
+        nicknameSend.disabled = true;
+        text.disabled = true;
 
         // Po kliknięciu guzika „Połącz” tworzymy nowe połączenie WS
         open.addEventListener('click', () => {
             open.disabled = true;
+            nickname.disabled = false;
+            nicknameSend.disabled = false;
             socket = io.connect(`http://${location.host}`);
 
             socket.on('connect', () => {
@@ -29,6 +34,7 @@ document.onreadystatechange = () => {
                 status.src = 'img/bullet_green.png';
                 console.log('Nawiązano połączenie przez Socket.io');
             });
+
             socket.on('disconnect', () => {
                 open.disabled = false;
                 status.src = 'img/bullet_red.png';
@@ -37,12 +43,31 @@ document.onreadystatechange = () => {
             socket.on('error', (err) => {
                 message.textContent = `Błąd połączenia z serwerem: "${JSON.stringify(err)}"`;
             });
+
+            socket.on('user check', (check,userName) => {
+                if(check === "free"){
+                nickname.disabled = true;
+                nicknameSend.disabled = true;
+                send.disabled = false;
+                text.disabled = false;
+                socket.emit('new user', userName);
+                socket.emit('chat history');
+                }
+                else{
+                    alert("Nick zajęty");
+                }
+            });
+
             socket.on('echo', (data) => {
-                message.textContent = data;
+                let messageLi = document.createElement('li');
+                  messageLi.innerHTML = `${data.user}: ${data.text}`;
+                  message.appendChild(messageLi);
             });
 
             socket.on('new message', (data) => {
-                message.textContent = data;
+                let messageLi = document.createElement('li');
+                  messageLi.innerHTML = `${data.user}: ${data.text}`;
+                  message.appendChild(messageLi);
             });
         });
 
@@ -55,15 +80,13 @@ document.onreadystatechange = () => {
         });
 
         nicknameSend.addEventListener('click', () => {
-            nicknameSend.disabled = true;
-            socket.emit('new user', nickname.value);
-            send.disabled = false;
-            console.log(`Login: ${nickname.value}`);
+            socket.emit('user check', nickname.value);
         });
 
         // Wyślij komunikat do serwera po naciśnięciu guzika „Wyślij”
         send.addEventListener('click', () => {
-            socket.emit('message', text.value);
+            let message = {user: nickname.value, text: text.value};
+            socket.emit('message', message);
             console.log(`Wysłałem wiadomość: „${text.value}”`);
             text.value = '';
         });

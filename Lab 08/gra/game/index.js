@@ -1,29 +1,46 @@
 //jshint node: true, esversion: 6
 const newGame = (req, res) => {
-    let newGame = {
-        "size": req.body.size,
-        "dim": req.body.dim,
-        "max": req.body.max
-    };
-    
-    if (size === undefined){
+
+
+    var dim = req.body.dim;
+    var size = req.body.size;
+    var max = req.body.max;
+    var kod = [];
+
+    if (size === undefined) {
         size = 5;
     }
 
-    if (dim === undefined){
+    if (dim === undefined) {
         dim = 9;
     }
 
-    if (max === undefined){
-        max = 0;
+    if (max === undefined) {
+        max = 0
     }
 
+    for (let i = 0; i < size; i++) {
+        kod[i] = Math.floor(Math.random() * dim);
+    }
+
+    var play = {
+        size,
+        dim,
+        max,
+        kod
+    };
+
+    req.session.kod = kod;
+    res.send(play);
 };
 
 const markAnswer = (req, res) => {
+
+    var kod = req.session.kod;
+
     var ruch = req.body.move;
 
-    var wynik;
+    var wynik = [];
 
     const ocena = (kod) => {
         return (ruch) => {
@@ -54,19 +71,28 @@ const markAnswer = (req, res) => {
                     });
                 });
 
-                wynik = "Czarne: " + czarne + " Biale: " + biale;
+                var mark = {
+                    czarne,
+                    biale
+                };
 
-                return "Czarne: " + czarne + " Biale: " + biale;
+                res.send(mark);
+
+                return "Czarne : " + czarne + " Biale : " + biale;
             }
 
             else {
                 throw({typerr: "Drugi gracz podal za duzo elementow."});
             }
-            
-        };
-        };
+
+        }
+
+    };
+
+
+    console.log(ocena(kod)(ruch));
+
 };
-res.send(wynik);
 
 module.exports = {
     newGame,
