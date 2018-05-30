@@ -4,6 +4,7 @@
 <head>
   <title>Prosty klient WebSockets</title>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/style.css"/>
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/skrypt.js"></script>
 </head>
@@ -11,21 +12,20 @@
 <body>
   <div>
     <table>
+      <tr><td><td> <img id="status" src="img/bullet_red.png" width="35"> </td></td></tr>
       <tr>
-        <td> <img id="status" src="img/bullet_red.png" width="35"> </td>
         <td> <input id="open" type="button" value="Połącz"> </td>
         <td> <input id="close" type="button" value="Rozłącz"> </td>
       </tr>
+      <tr>
+        <td><input id="nickname">&nbsp;<input id="nicknameSend" type="button" value="Wyślij"></td>
+        <td>Nick:</td>
+      </tr>
     </table>
-    <p>
-      Nick:&nbsp;
-      <input id="nickname">&nbsp;<input id="nicknameSend" type="button" value="Wyślij">
-    </p>
-    <p>
-      Komunikat:&nbsp;
-      <input id="text">&nbsp;<input id="send" type="button" value="Wyślij">
-    </p>
     <p id="message"></p>
+    <p>
+      <input id="text"><br><input id="send" type="button" value="Wyślij">
+    </p>
   </div>
 </body>
 

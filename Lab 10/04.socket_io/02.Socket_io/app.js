@@ -18,6 +18,9 @@ io.sockets.on('connect', (socket) => {
 
     socket.on('user check',(userName)=>{
         let free=1;
+        if(userName===""){
+            socket.emit('user check',"occupied",userName);
+        }
         users.forEach((userAv) =>{
             if(userAv === userName){
                 free = 0;

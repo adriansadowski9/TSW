@@ -60,12 +60,14 @@ document.onreadystatechange = () => {
 
             socket.on('echo', (data) => {
                 let messageLi = document.createElement('li');
+                  messageLi.setAttribute("id", "chatLi");
                   messageLi.innerHTML = `${data.user}: ${data.text}`;
                   message.appendChild(messageLi);
             });
 
             socket.on('new message', (data) => {
                 let messageLi = document.createElement('li');
+                  messageLi.setAttribute("id", "chatLi");
                   messageLi.innerHTML = `${data.user}: ${data.text}`;
                   message.appendChild(messageLi);
             });
@@ -87,7 +89,6 @@ document.onreadystatechange = () => {
         send.addEventListener('click', () => {
             let message = {user: nickname.value, text: text.value};
             socket.emit('message', message);
-            console.log(`Wysłałem wiadomość: „${text.value}”`);
             text.value = '';
         });
     }

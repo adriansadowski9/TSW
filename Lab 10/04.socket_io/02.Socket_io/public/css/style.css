@@ -1,0 +1,41 @@
+body {
+  height: 100vh;
+  background-color: #F4F6F6;
+}
+body div table {
+  float: right;
+}
+body div table tr td {
+  float: right;
+}
+body div #message {
+  width: 30%;
+  margin: 0 auto;
+  margin-top: 1%;
+  height: 40vh;
+  background-color: #ABB2B9;
+  border: 1px solid black;
+}
+body div #message #chatLi {
+  list-style-type: none;
+  text-align: left;
+}
+body div p {
+  margin: 0 auto;
+  text-align: center;
+}
+body div p #text {
+  margin-top: 1.5%;
+  width: 15%;
+  height: 7vh;
+  background-color: #D6DBDF;
+  border: 1px solid black;
+}
+body div p #send {
+  margin-top: 1%;
+  width: 10%;
+  height: 4vh;
+  background-color: #28B463;
+  color: white;
+  border: 1px solid black;
+}
