@@ -125,6 +125,10 @@ app.use(webpackDevMiddleware(compiler, {
   historyApiFallback: true,
 }));
 
+app.use(function (req, res) {
+  res.render('error',{ status: 404, url: req.url });
+});
+
 const server = app.listen(4000, function() {
   console.log('App listening at port 4000');
 });

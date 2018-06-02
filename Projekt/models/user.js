@@ -16,6 +16,9 @@ var UserSchema = mongoose.Schema({
 	},
 	name: {
 		type: String
+	},
+	joined: {
+		type: String
 	}
 });
 

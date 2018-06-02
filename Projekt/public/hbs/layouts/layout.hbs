@@ -21,7 +21,7 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             {{#if user}}
-              <li role="presentation"><a href="/">Dashboard</a></li>
+              <li role="presentation"><a href="/profile">Profile</a></li>
               <li role="presentation"><a href="/logout">Logout</a></li>
             {{else}}
               <li role="presentation"><a href="/login">Login</a></li>
@@ -35,15 +35,15 @@
       <div class="row">
         <div class="col-lg-12">
           {{#if success_msg}}
-            <div class="alert alert-success">{{success_msg}}</div>
+            <div class="alert alert-success" style="margin-top:20px;">{{success_msg}}</div>
           {{/if}}
 
           {{#if error_msg}}
-            <div class="alert alert-danger">{{error_msg}}</div>
+            <div class="alert alert-danger" style="margin-top:20px;">{{error_msg}}</div>
           {{/if}}
 
           {{#if error}}
-            <div class="alert alert-danger">{{error}}</div>
+            <div class="alert alert-danger" style="margin-top:20px;">{{error}}</div>
           {{/if}}
           
           {{{body}}}
