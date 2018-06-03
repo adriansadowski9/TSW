@@ -4,6 +4,7 @@ var router = express.Router();
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcryptjs');
+var ObjectId = require('mongodb').ObjectID;
 
 var User = require('../models/user.js');
 
@@ -47,21 +48,25 @@ router.get('/changepassword', isAuthenticated, function (req, res) {
 router.post('/editprofile', function (req,res) {
 	var descriptionText = req.body.description;
 	if(descriptionText){
-		console.log(req.user.username);
-		User.updateOne({username:{ "$regex": "^" + req.user.username + "\\b", "$options": "i"}},{$set:{description: descriptionText}}); // NIE DZIAŁA
-		req.flash('success_msg', 'You successfuly edited your profile');
-		res.redirect('/profile');
-	}
-	else
-	{
-		req.flash('error_msg', 'Something went wrong...');
-		res.redirect('/profile');
+		User.updateOne({_id:ObjectId(req.user._id)},{$set:{description: descriptionText}},function (err, userEdit){
+			if (err){
+				req.flash('error_msg', 'Something went wrong...');
+				res.redirect('/profile');
+				throw err;
+			}
+			else{
+				req.flash('success_msg', 'You successfuly edited your profile');
+				res.redirect('/profile');
+			}
+		});
 	}
 });
 
 router.post('/changepassword', function (req,res) {
 	var newPassword = req.body.password;
-	req.checkBody('password', 'Password is required').notEmpty();
+	var oldPassword = req.body.oldPassword;
+	req.checkBody('oldPassword', 'Old password is required').notEmpty();
+	req.checkBody('password', 'New password is required').notEmpty();
 	if(newPassword){
 		req.checkBody("password", "Password must include 8 characters with one lowercase character, one uppercase character, a number, and a special character.").matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i");
 		req.checkBody('password2', 'Passwords do not match').equals(newPassword);
@@ -73,15 +78,32 @@ router.post('/changepassword', function (req,res) {
 		});
 	}
 	else{
-		bcrypt.genSalt(10, function(err, salt) {
-			bcrypt.hash(newPassword, salt, function(err, hash) {
-				newPassword = hash;
+		var validPassword = User.checkPassword(oldPassword,req.user.password); // NIE DZIAŁA - UNDEFINED
+			console.log('valid password: '+validPassword);
+		if(!validPassword){
+			res.render('changepassword', {
+				incorrectPassword: "Invalid"
 			});
-		});
-		console.log(newPassword); // NIE DZIAŁA HASH
-		User.updateOne({username:{ "$regex": "^" + req.user.username + "\\b", "$options": "i"}},{$set:{password: newPassword}});
-		req.flash('success_msg', 'You successfuly changed password');
-		res.redirect('/profile');
+		}
+		else{
+			console.log("zmiana");
+			bcrypt.genSalt(10, function(err, salt) {
+				bcrypt.hash(newPassword, salt, function(err, hash) {
+					newPassword = hash;
+					User.updateOne({_id:ObjectId(req.user._id)},{$set:{password: newPassword}},function (err, userEdit){
+						if (err){
+							req.flash('error_msg', 'Something went wrong...');
+							res.redirect('/profile');
+							throw err;
+						}
+						else{
+							req.flash('success_msg', 'You successfuly changed your password');
+							res.redirect('/profile');
+						}
+					});
+				});
+			});
+		}
 	}
 });
 

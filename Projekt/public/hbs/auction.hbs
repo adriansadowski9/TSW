@@ -1,0 +1,24 @@
+<div class="container target">
+    <div class="row">
+        <div class="col-sm-10">
+             <h1 class="">{{auction.name}}</h1>
+        </div>
+    </div>
+  <br>
+    <div class="row">
+        <div class="col-sm-3">
+            <ul class="list-group">
+                <li class="list-group-item text-muted" contenteditable="false">Auction details</li>
+                <li class="list-group-item text-right"><span class="pull-left"><strong class="">Owner</strong></span>{{user.username}}</li>
+                <li class="list-group-item text-right"><span class="pull-left"><strong class="">Listed time</strong></span>{{auction.listed}}</li>
+                <li class="list-group-item text-right"><span class="pull-left"><strong class="">Ending time</strong></span>{{auciton.end}}</li>
+            </ul>
+        </div>
+        <!--/col-3-->
+        <div class="col-sm-9" style="" contenteditable="false">
+            <div class="panel panel-default">
+                <div class="panel-heading">Auction description</div>
+                <div class="panel-body"> {{auction.description}}</div>
+            </div>
+    </div>
+</div>

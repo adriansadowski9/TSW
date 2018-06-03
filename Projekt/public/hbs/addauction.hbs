@@ -1,0 +1,34 @@
+<h2 class="page-header">Add auction</h2>
+{{#if errors}}
+      {{#each errors}}
+        <div class="alert alert-danger">{{msg}}</div>
+      {{/each}}
+{{/if}}
+<form method="post" action="/addauction">
+  <div class="form-group">
+    <label>Name</label>
+    <input type="text" class="form-control"name="name">
+    <label>Description</label>
+    <input type="text" class="form-control"name="description">
+    <label>Price</label>
+    <input type="text" class="form-control"name="price">
+    <label>Auction type</label>
+        <select class="form-control" name="listedType">
+            <option value="auction">Auction</option>
+            <option value="buyNow">Buy now</option>
+        </select>
+    <label>Wait before list</label>
+        <select class="form-control" name="wait">
+            <option value="15minutes">15 minutes</option>
+            <option value="30minutes">30 minutes</option>
+            <option value="1hour">Hour</option>
+        </select>
+    <label>List for</label>
+        <select class="form-control" name="listTime">
+            <option value="3days">3 days</option>
+            <option value="7days">7 days</option>
+            <option value="14days">14 days</option>
+        </select>
+  </div>
+  <a href="/" class="btn btn-danger">Cancel</a> <button type="submit" class="btn btn-default">Submit</button>
+</form>

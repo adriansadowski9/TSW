@@ -37,6 +37,7 @@ db.once('open', function callback () {
 });
 
 var users = require('./routes/users');
+var auctions = require('./routes/auctions');
 
 //Express in
 const app = express();
@@ -114,6 +115,7 @@ app.route('/')
   });
 
 app.use('/', users);
+app.use('/', auctions);
 
 app.use(webpackDevMiddleware(compiler, {
   hot: true,

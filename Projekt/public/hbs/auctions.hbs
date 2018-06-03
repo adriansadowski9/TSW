@@ -1,0 +1,5 @@
+<h2 class="page-header">Auctions</h2>
+{{#each auctions}}
+    {{this.name}}<br>
+    <a href="../auction/{{this._id}}" class="btn btn-success">Show auction</a>
+  {{/each}}
