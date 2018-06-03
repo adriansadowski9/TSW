@@ -3,7 +3,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var passwordValidator = require('password-validator');
+var bcrypt = require('bcryptjs');
 
 var User = require('../models/user.js');
 
@@ -36,6 +36,55 @@ router.get('/profile', isAuthenticated, function (req, res) {
 	res.render('profile');
 });
 
+router.get('/editprofile', isAuthenticated, function (req, res) {
+	res.render('editprofile');
+});
+
+router.get('/changepassword', isAuthenticated, function (req, res) {
+	res.render('changepassword');
+});
+
+router.post('/editprofile', function (req,res) {
+	var descriptionText = req.body.description;
+	if(descriptionText){
+		console.log(req.user.username);
+		User.updateOne({username:{ "$regex": "^" + req.user.username + "\\b", "$options": "i"}},{$set:{description: descriptionText}}); // NIE DZIAŁA
+		req.flash('success_msg', 'You successfuly edited your profile');
+		res.redirect('/profile');
+	}
+	else
+	{
+		req.flash('error_msg', 'Something went wrong...');
+		res.redirect('/profile');
+	}
+});
+
+router.post('/changepassword', function (req,res) {
+	var newPassword = req.body.password;
+	req.checkBody('password', 'Password is required').notEmpty();
+	if(newPassword){
+		req.checkBody("password", "Password must include 8 characters with one lowercase character, one uppercase character, a number, and a special character.").matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i");
+		req.checkBody('password2', 'Passwords do not match').equals(newPassword);
+	}
+	var errors = req.validationErrors();
+	if (errors) {
+		res.render('changepassword', {
+			errors: errors
+		});
+	}
+	else{
+		bcrypt.genSalt(10, function(err, salt) {
+			bcrypt.hash(newPassword, salt, function(err, hash) {
+				newPassword = hash;
+			});
+		});
+		console.log(newPassword); // NIE DZIAŁA HASH
+		User.updateOne({username:{ "$regex": "^" + req.user.username + "\\b", "$options": "i"}},{$set:{password: newPassword}});
+		req.flash('success_msg', 'You successfuly changed password');
+		res.redirect('/profile');
+	}
+});
+
 // Register User
 router.post('/register', function (req, res) {
 	var name = req.body.name;
@@ -43,9 +92,7 @@ router.post('/register', function (req, res) {
 	var username = req.body.username;
 	var password = req.body.password;
 	var password2 = req.body.password2;
-	var schema = new passwordValidator();
-
-	schema.is().min(7).is().max(100).has().uppercase().has().lowercase().has().digits().has().not().spaces();
+	var description = "My description";
 
 	// Validation
 	req.checkBody('name', 'Name is required').notEmpty();
@@ -93,8 +140,10 @@ router.post('/register', function (req, res) {
 						email: email,
 						username: username,
 						password: password,
+						description: description,
 						joined: date.toLocaleDateString()
 					});
+					console.log(newUser);
 					User.createUser(newUser, function (err, user) {
 						if (err) throw err;
 						console.log(user);

@@ -17,6 +17,9 @@ var UserSchema = mongoose.Schema({
 	name: {
 		type: String
 	},
+	description: {
+		type: String
+	},
 	joined: {
 		type: String
 	}
