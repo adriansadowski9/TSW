@@ -23,6 +23,24 @@
                 <div class="panel-body"> {{user.description}}</div>
             </div>
             <div class="panel panel-default">
+                <div class="panel-heading">Won auctions</div>
+                <div class="panel-body">
+                        <div class="card-deck">
+                        {{#each wonAuctions}}
+                            {{#dividedby3 @index}}</div>{{/dividedby3}}
+                            {{#dividedby3 @index}}<div class="card-deck" style="margin-top:20px;">{{/dividedby3}}
+                                <div class="card" >
+                                    <div class="card-body">
+                                        <h4 class="card-title">{{this.name}}</h4>
+                                        <p class="card-text">Price: {{this.price}}</p>
+                                        <a href="/auction/{{this._id}}" class="btn btn-primary">Go to auction</a> <a href="/editauction/{{this._id}}" class="btn btn-warning">Edit auction</a>
+                                </div>
+                            </div>
+                        {{/each}}
+                        </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
                 <div class="panel-heading">My auctions</div>
                 <div class="panel-body">
                         <div class="card-deck">

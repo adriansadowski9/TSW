@@ -59,12 +59,38 @@ router.get('/auction/:auctionId', function (req, res) {
 	    Auction.findOne({_id:ObjectId(req.params.auctionId)}, function (err, auction) {
 		    if (auction) {
                 User.findOne({_id:ObjectId(auction.ownerId)}, function (err, user) {
-                    if(user){
-                        res.render('auction', {auction: auction,user:user});
-                    }
-                    else{
-                        res.render('error',{ status: 404, url: req.url });
-                    }
+                    	if(user){
+							if(auction.ended){
+								if(req.user){
+									if((auction.ownerId == req.user._id)||(auction.buyerId == req.user._id))
+									{
+										res.render('auction', {auction: auction,user:user});
+									}
+									else{
+									req.flash('error_msg', 'You cant show ended auction');
+									res.redirect('/auctions');
+									}
+								}
+								else{
+									req.flash('error_msg', 'You cant show ended auction');
+									res.redirect('/auctions');
+									}
+							}
+							else{
+								var typeAuctionTest = false;
+								var typeBuyNowTest = false;
+								if(auction.listedType == "auction"){
+									typeAuctionTest = true;
+								}
+								else{
+									typeBuyNowTest = true;
+								}
+							res.render('auction', {auction: auction,user:user,listedType:{typeAuction:typeAuctionTest,typeBuyNow:typeBuyNowTest}});
+							}
+                    	}
+                    	else{
+                    	    res.render('error',{ status: 404, url: req.url });
+						}
                 });
 		    }
 		    else {
@@ -83,15 +109,48 @@ router.get('/editauction/:auctionId',isAuthenticated, function (req, res) {
 	    Auction.findOne({_id:ObjectId(req.params.auctionId)}, function (err, auction) {
 		    if (auction) {
 				if(auction.ownerId == req.user._id){
-					var typeAuctionTest = false;
-					var typeBuyNowTest = false;
-					if(auction.listedType == "auction"){
-						typeAuctionTest = true;
-					}
-					else{
-						typeBuyNowTest = true;
-					}
-					res.render('editauction', {auction: auction,listedType:{typeAuction:typeAuctionTest,typeBuyNow:typeBuyNowTest}});
+					if(auction.listed){
+						req.flash('error_msg', 'You cant edit listed auction');
+						res.redirect('/profile');
+						}
+						else{
+							var typeAuctionTest = false;
+							var typeBuyNowTest = false;
+							if(auction.listedType == "auction"){
+								typeAuctionTest = true;
+							}
+							else{
+								typeBuyNowTest = true;
+							}
+							res.render('editauction', {auction: auction,listedType:{typeAuction:typeAuctionTest,typeBuyNow:typeBuyNowTest}});
+						}
+				}
+				else{
+					res.render('error',{ status: 404, url: req.url });	
+				}
+			}
+			else{
+				res.render('error',{ status: 404, url: req.url });
+			}
+        });
+	}
+	else{
+        res.render('error',{ status: 404, url: req.url });
+	}	
+});
+
+router.get('/auction/:auctionId/buynow',isAuthenticated, function (req, res) {
+	if(req.params.auctionId.length == 12 || req.params.auctionId.length == 24){
+	    Auction.findOne({_id:ObjectId(req.params.auctionId)}, function (err, auction) {
+		    if (auction) {
+				if(auction.listed && !auction.ended){
+					if(auction.ownerId == req.user._id){
+						req.flash('error_msg', 'You cant buy own item');
+						res.redirect('/auction/'+req.params.auctionId);
+						}
+						else{
+							res.render('buynow', {auction: auction});
+						}
 				}
 				else{
 					res.render('error',{ status: 404, url: req.url });	
@@ -154,7 +213,8 @@ router.post('/editauction/:auctionId', function (req, res) {
 
 	req.checkBody('name', 'Name is required').notEmpty();
 	req.checkBody('description', 'Description is required').notEmpty();
-	req.checkBody('price','Price must look like: 199.99 ').matches(/[1-9]\d{0,7}(?:\.\d{1,2})?$/,"i");
+	req.checkBody('price','Price must look like: 199.99').matches(/[1-9]\d{0,7}(?:\.\d{1,2})?$/,"i"); // Regex nie działa
+	
 
 	var errors = req.validationErrors();
 	if (errors) {
@@ -174,6 +234,49 @@ router.post('/editauction/:auctionId', function (req, res) {
 				res.redirect('/profile');
 			}
 		});
+	}
+});
+
+router.post('/auction/:auctionId', function (req, res) {
+	var newPrice = req.body.price;
+	req.checkBody('price','Price must look like: 199.99').matches(/[1-9]\d{0,7}(?:\.\d{1,2})?$/,"i"); // Regex nie działa
+	var errors = req.validationErrors();
+	if (errors) {
+		req.flash('error_msg', 'Price must look like: 199.99');
+		res.redirect('/auction/'+req.params.auctionId);
+	}
+	else{
+		if(req.user){
+			Auction.findOne({_id:ObjectId(req.params.auctionId)},function (err, bidAuction){
+				if(bidAuction.ownerId == req.user._id){
+					req.flash('error_msg', 'You cant bid on own auction');
+					res.redirect('/auction/'+bidAuction._id);
+					}
+				else{
+					if(newPrice <= bidAuction.price){
+						req.flash('error_msg', 'Bid price must be higher than actual');
+						res.redirect('/auction/'+bidAuction._id);
+					}
+					else{
+						Auction.updateOne({_id:ObjectId(req.params.auctionId)},{$set:{buyerId:req.user._id,price:newPrice}},function (err, BidNow){
+							if (err){
+								req.flash('error_msg', 'Something went wrong...');
+								res.redirect('/auction/'+bidAuction._id);
+								throw err;
+							}
+							else{
+								req.flash('success_msg', 'You bid successfully');
+								res.redirect('/auction/'+bidAuction._id);
+							}
+						});
+					}
+				}
+			});
+		}
+		else{
+			req.flash('error_msg', 'You need to be logged in to bid');
+			res.redirect('/login/');
+		}
 	}
 });
 

@@ -39,7 +39,9 @@ router.get('/login', isLoggedIn, function (req, res) {
 router.get('/profile', isAuthenticated, function (req, res) {
 	Auction.find({ownerId:req.user._id,ended:false}, function (err, auctions) {
 		Auction.find({ownerId:req.user._id,ended:true}, function (err, endedAuctions) {
-			res.render('profile', {auctions:auctions,endedAuctions:endedAuctions});
+			Auction.find({buyerId:req.user._id,ended:true}, function (err, wonAuctions) {
+				res.render('profile', {auctions:auctions,endedAuctions:endedAuctions,wonAuctions:wonAuctions});
+			});
 		});
 	});
 });
