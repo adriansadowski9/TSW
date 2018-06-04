@@ -5,8 +5,11 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcryptjs');
 var ObjectId = require('mongodb').ObjectID;
+var moment = require('moment');
+var Handlebars = require('handlebars');
 
 var User = require('../models/user.js');
+var Auction = require('../models/auction.js');
 
 var isAuthenticated = function(req, res, next) {
 	if (req.isAuthenticated()) {
@@ -34,7 +37,11 @@ router.get('/login', isLoggedIn, function (req, res) {
 });
 
 router.get('/profile', isAuthenticated, function (req, res) {
-	res.render('profile');
+	Auction.find({ownerId:req.user._id,ended:false}, function (err, auctions) {
+		Auction.find({ownerId:req.user._id,ended:true}, function (err, endedAuctions) {
+			res.render('profile', {auctions:auctions,endedAuctions:endedAuctions});
+		});
+	});
 });
 
 router.get('/editprofile', isAuthenticated, function (req, res) {
@@ -163,15 +170,13 @@ router.post('/register', function (req, res) {
 						username: username,
 						password: password,
 						description: description,
-						joined: date.toLocaleDateString()
+						joined: moment().format("Do MMMM YYYY h:mm a")
 					});
-					console.log(newUser);
 					User.createUser(newUser, function (err, user) {
 						if (err) throw err;
-						console.log(user);
 					});
          	req.flash('success_msg', 'You are registered and can now login');
-					res.redirect('/login');
+					res.redirect('/profile');
 				}
 			});
 		});
@@ -224,12 +229,18 @@ router.get('/logout', function (req, res) {
 router.get('/user/:username', function (req, res) {
 	User.findOne({ username: { "$regex": "^" + req.params.username + "\\b", "$options": "i"}}, function (err, user) {
 		if (user) {
-			res.render('user', {user: user});
+			Auction.find({ownerId:user._id,ended:false}, function (err, auctions) {
+					res.render('user', {auctions:auctions,user:user});
+				});
 		}
 		else {
 			res.render('error',{ status: 404, url: req.url });
 		}	
 	});
+});
+
+Handlebars.registerHelper('dividedby3', function(arg1, options) {
+    return (((arg1 + 1) % 4) == 0) ? options.fn(this) : options.inverse(this);
 });
 
 module.exports = router;

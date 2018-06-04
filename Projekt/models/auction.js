@@ -12,24 +12,30 @@ var AuctionSchema = mongoose.Schema({
 	},
 	price: {
 		type: String
-    },
-    listedType: {
+  	},
+  	listedType: {
 		type: String
 	},
 	created: {
 		type: String
-    },
-    listed: {
+  	},
+  	listedTime: {
 		type: String
-    },
-    end: {
+  	},
+  	end: {
 		type: String
-    },
-    ownerId: {
+  	},
+  	ownerId: {
 		type: String
 	},
-	buyerId: {
+  	buyerId: {
 		type: String
+	},
+	listed:{
+		type: Boolean
+	},
+  	ended: {
+		type: Boolean
 	}
 });
 
