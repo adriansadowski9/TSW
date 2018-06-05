@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "iosfwd": "c",
+        "xlocbuf": "c",
+        "utility": "c",
+        "mutex": "c"
+    }
+}

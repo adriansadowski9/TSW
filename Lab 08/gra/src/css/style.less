@@ -1,10 +1,74 @@
 // out: ../../public/css/style.css, compress: true
+
 body {
-    padding: 50px;
-    font-family: Consolas, Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    background-color: azure;
-}
-a {
-    color: #00B7FF;
+    background: #2E4053;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'Roboto', sans-serif;
+    color: #fff;
+    #all {
+        position: relative;
+        margin: 5% auto 0;
+        text-align: center;
+        input {    
+            padding: 12px 20px;
+            margin: 8px 0;
+            text-align:center;
+           }
+        button {
+            margin-top:10px;
+            background-color: #2E4053;
+            color: white;
+            border: 1px solid white;
+            padding: 12px 30px;
+        }
+        button:hover {
+            background-color: white; 
+            color: #2E4053;
+        }
+    }
+    #inputs{
+        text-align:center;
+        input {    
+            padding: 12px 20px;
+            text-align:center;
+            width: 20px;
+            color: #2E4053;
+            margin: 3px 3px;
+           }
+        }
+    .btn{
+            background-color: #2E4053;
+            color: white;
+            border: 1px solid white;
+            padding: 12px 30px;
+    }
+    .btn:hover {
+            background-color: white;
+            color: #2E4053;
+    }
+    #mHistory{
+        #history{
+            font-size: 22px;
+            line-height:5px;
+        }
+        #white{    
+            padding: 12px 25px;
+            text-align:center;
+            margin: 3px 3px;
+            background-color: #F8F9F9;
+            color: #17202A;
+            border: 1px gray;
+           }
+        #black{    
+            padding: 12px 25px;
+            text-align:center;
+            margin: 3px 3px;
+            background-color: #17202A;
+            color: #F8F9F9;
+            border: 1px gray;
+           }
+    }
 }

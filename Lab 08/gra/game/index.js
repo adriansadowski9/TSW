@@ -1,23 +1,13 @@
 //jshint node: true, esversion: 6
 const newGame = (req, res) => {
-
-
-    var dim = req.body.dim;
-    var size = req.body.size;
-    var max = req.body.max;
+    let size = req.body.size;
+    let dim = req.body.dim;
+    let max = req.body.max;
     var kod = [];
 
-    if (size === undefined) {
-        size = 5;
-    }
-
-    if (dim === undefined) {
-        dim = 9;
-    }
-
-    if (max === undefined) {
-        max = 0
-    }
+    if (!dim) dim = 9;
+    if (!size) size = 5;
+    if (!max) max = 0;
 
     for (let i = 0; i < size; i++) {
         kod[i] = Math.floor(Math.random() * dim);
@@ -49,24 +39,26 @@ const markAnswer = (req, res) => {
                 var biale = 0;
                 var czarne = 0;
 
-                var tmp_ruch = [];
-                var tmp_kod = [];
+                var ruchTmp = [];
+                var kodTmp = [];
+                let tmp = 0;
 
-                ruch.forEach((ru, index) => {
-                    if (Object.is(kod[index], ru)) {
+                ruch.forEach((eRuch, index) => {
+                    if (Object.is(kod[index], eRuch)) {
                         czarne++;
                     }
                     else {
-                        tmp_ruch.push(ru);
-                        tmp_kod.push(kod[index]);
+                        ruchTmp.push(eRuch);
+                        kodTmp.push(kod[index]);
                     }
                 });
-
-                tmp_ruch.forEach((ru, index) => {
-                    tmp_kod.forEach((ko, index1) => {
-
-                        if (Object.is(ru, ko)) {
+                ruchTmp.forEach((eRuch, index) => {
+                    tmp = 0;
+                    kodTmp.forEach((eKod, index1) => {
+                        if (Object.is(eRuch, eKod) && tmp == 0) {
                             biale++;
+                            tmp = 1;
+                            kodTmp.splice(index1,1);
                         }
                     });
                 });
@@ -77,21 +69,15 @@ const markAnswer = (req, res) => {
                 };
 
                 res.send(mark);
-
-                return "Czarne : " + czarne + " Biale : " + biale;
             }
 
             else {
-                throw({typerr: "Drugi gracz podal za duzo elementow."});
+                throw({typerr: "Za duzo elementow"});
             }
 
-        }
-
+        };
     };
-
-
     console.log(ocena(kod)(ruch));
-
 };
 
 module.exports = {

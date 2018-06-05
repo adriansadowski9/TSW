@@ -1,110 +1,122 @@
-/*jshint jquery: true, devel: true */
-$(function () {
+/*jshint jquery: true, devel: true,esversion: 6*/
+$(() => {
+    let size;
+    let max;
+    let counter = 0;
+    let test = 0;
+    let move = [];
+    const sendPlay = (size, dim, max) => {
+          $.ajax({
+              url: "/play",
+              type: "POST",
+              data: JSON.stringify({size, dim, max}),
+              contentType: "application/json",
+            complete: handleGameResponse
+          });
+      };
+  
+    const sendMark = (move) => {
+      $.ajax({
+        url: "/mark",
+        type: "POST",
+        data: JSON.stringify({move}),
+        contentType: "application/json",
+        complete: handleMarkResponse
+      });
+    };
+  
+    const handleGameResponse = (json) => {
+          if (json.status === 200) {
+            $('label').remove();
+            $('input').remove();
+            $('button').remove();
+            $('br').remove();
+  
+            console.log(json.responseText);
+            $("body").append(`<div id="inputs"></div>`);
+            size = json.responseJSON.size;
+            max = json.responseJSON.max;
+            for (let i = 0; i < size; i++) {
+                $("#inputs").append(`<input type="text" id="${i}"/>`);
+                if((i+1)%5==0){
+                    $("#inputs").append(`<br/>`);
+                }
+            }
+            $("body").append(`<br/>`);
+            $("body").append(`<button id="mark" class="btn" type="button">Sprawdź</button>`);
 
-    var size;
-    var dim;
-    var max;
-    var wyniki = "";
-    var pom;
-
-    if (sessionStorage.getItem("kod") !== null) {
-        $("#size").val(sessionStorage.getItem("size"));
-        $("#dim").val(sessionStorage.getItem("dim"));
-        $("#max").val(sessionStorage.getItem("max"));
-
-        if (sessionStorage.getItem("wyniki") !== null) {
-            $("#wyniki").empty().append(sessionStorage.getItem("wyniki"));
-            wyniki = sessionStorage.getItem("wyniki");
-        }
-    }
-
-    $("#play").click(function () {
-
-        sessionStorage.clear();
-        location.reload();
-
-        if ($("#size").val().length !== 0) {
-            size = $("#size").val();
-        }
-        if ($("#dim").val().length !== 0) {
-            dim = $("#dim").val();
-        }
-        if ($("#max").val().length !== 0) {
-            max = $("#max").val();
-        }
-
-        $("#move").val(null);
-
-        $.ajax({
-            method: "POST",
-            url: "/play",
-            data: JSON.stringify({size: size, dim: dim, max: max}),
-            contentType: "application/json"
-        })
-            .done(function (data) {
-                alert(data.kod);
-                sessionStorage.setItem("kod", data.kod);
-                sessionStorage.setItem("size", data.size);
-                sessionStorage.setItem("dim", data.dim);
-                sessionStorage.setItem("max", data.max);
-            });
-        location.reload();
-    });
-
-    if (sessionStorage.getItem("ruch") !== null) {
-        $("#move").val(sessionStorage.getItem("ruch"));
-    }
-
-    $("#mark").click(function () {
-
-        move = JSON.parse("[" + $("#move").val() + "]");
-        sessionStorage.setItem("ruch", $("#move").val());
-        $.ajax({
-            method: "POST",
-            url: "/mark",
-            data: JSON.stringify({move: move}),
-            contentType: "application/json"
-        })
-            .done(function (data) {
-
-                if (parseInt(sessionStorage.getItem("max")) > 0) {
-
-                    pom = parseInt(sessionStorage.getItem("max")) - 1;
-
-                    sessionStorage.setItem("max", pom);
-
-                    if (parseInt(sessionStorage.getItem("max")) === 0) {
-                        if (parseInt(data.czarne) === parseInt(sessionStorage.getItem("size"))) {
-                            alert("Wygrałeś!");
-                            sessionStorage.clear();
-                            location.reload();
-                        }
-
-                        else {
-                            alert("Przegrałeś!");
-                            sessionStorage.clear();
-                            location.reload();
-                        }
+            $("body #mark").on("click", () => {
+                test = 0;
+                for (let i = 0; i < size; i++) {
+                    if($(`#${i}`).val()===""){
+                        test = 1;
                     }
-
                 }
-
-                if (parseInt(data.czarne) === parseInt(sessionStorage.getItem("size"))) {
-                    alert("Wygrałeś!");
-                    sessionStorage.clear();
-                    location.reload();
+                if(test===0){
+                    for (let i = 0; i < size; i++) {
+                       move.push(parseInt($(`#${i}`).val(),10));
+                    }
+                    if(parseInt(max)===0){
+                        sendMark(move);
+                    }
+                    else if(parseInt(counter) === parseInt(max)){
+                        $("button").remove();
+                        $('body').append('Przegrana - Wykorzystałeś/aś wszystkie możliwe ruchy.<br>');
+                        $("body").append(`<br><input type="button" class="btn" value="Cofnij" onclick="location.reload();">`);
+                    }
+                    else{
+                    counter++;
+                    sendMark(move);
+                    }
                 }
-
-                else {
-
-                    wyniki += "<br><br>Czarne : " + data.czarne + ", Biale :  " + data.biale + "<br><input type='text' id='move' value='" + $("#move").val() + "' disabled>";
-
-                    $("#wyniki").empty().append(wyniki);
-
-                    sessionStorage.setItem("wyniki", wyniki);
+                else{
+                    alert("Input cant be empty");
                 }
             });
+          }
+      };
+  
+    const handleMarkResponse = (json) => {
+      let answer = json.responseJSON;
+  
+      $('input').remove();
+      $('#inputs br').remove();
+      $("#inputs p").remove();
+  
+      if (json.status === 200) {
+        let lineCounter = 1;
+        $('div#mHistory').append(`<p>Twój ruch</p>`);
+        move.forEach((mov)=>{
+            $('div#mHistory').append(`<label id="history"> ${mov} </label>`);
+            if(lineCounter % 5 == 0){
+                $('div#mHistory').append(`<br>`);
+            }
+            lineCounter++;
+        });
+        $("div#mHistory").append(`<p>Twój wynik</p>`);
+        $("div#mHistory").append(`<label id="white">${answer.biale}</label><label id="black">${answer.czarne}</label><br>`);
+        $('p').show();
 
-    });
-
-});
+        if (parseInt(answer.czarne,10) === parseInt(size,10)) {
+          $('button').remove();
+          move = [];
+          $("body").append(`<p>Wygrałeś/aś!</p>`);
+          $("body").append(`<input type="button" class="btn" value="Cofnij" onclick="location.reload();">`);
+        } else {
+            $("#inputs").append(`<p id="kolejny">Kolejny ruch</p>`);
+          for (let i = 0; i < size; i++) {
+            $("#inputs").append(`<input type="text" id="${i}" value="${move[i]}"/>`);
+            if((i+1)%5==0){
+                $("#inputs").append(`<br/>`);
+            }
+        }
+        move = [];
+        }
+      }
+    };
+  
+    $("body #send").on("click", () => {
+      sendPlay($("#size").val(), $("#dim").val(), $("#max").val());
+      });
+  
+  });

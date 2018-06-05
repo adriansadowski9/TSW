@@ -1,6 +1,6 @@
 //jshint node: true, esversion: 6
-// ładujemy wykorzystywane moduły:
 
+// ładujemy wykorzystywane moduły:
 // express – jako „podstawa aplikacji”
 const express = require('express');
 // body-parser – żeby móc parsować dane przychodzące w zapytaniu

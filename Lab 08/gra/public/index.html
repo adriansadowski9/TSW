@@ -1,35 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Mastermind</title>
-    <link rel='stylesheet' href='/css/style.css'/>
+    <link type="text/css" rel='stylesheet' href='/css/style.css' />
     <script src='/js/jquery-3.2.0.min.js'></script>
     <script src='/js/skrypt.js'></script>
-</head>
-<body>
-
-
-<div id="play" class="przycisk notactive">
-    Nowa gra!
-</div>
-
-<div id="input">
-    <input type="number" id="size" name="size" class="input" placeholder="size"><br>
-    <input type="number" id="dim" name="dim" class="input" placeholder="dim"><br>
-    <input type="number" id="max" name="max" class="input" placeholder="max"><br>
-</div>
-
-<p>Wpisując swój ruch należy liczby pisać po przecinku np. "1,2,3".</p>
-
-<div id="mark" class="przycisk">
-    Graj!
-</div>
-
-<div id="wynik">
-    <input type="text" id="move" name="mark" placeholder="move">
-    <div id="wyniki"></div>
-</div>
-
-
-</body>
+  </head>
+  <body>
+    <div id="all">
+        <h1>Mastermind Game</h1>
+        <input title="size" id="size" placeholder="Size" type="text"><br>
+        <input title="dim" id="dim" placeholder="Dimension" type="text"><br>
+        <input title="max" id="max" placeholder="Max" type="text"><br>
+        <button id="send" type="button">Rozpocznij gre</button>
+        <div id="mHistory">
+        </div>
+    </div>
+  </body>
 </html>
