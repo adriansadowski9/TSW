@@ -37,13 +37,57 @@ router.get('/login', isLoggedIn, function (req, res) {
 });
 
 router.get('/profile', isAuthenticated, function (req, res) {
+	var skip = 0;
+	var limit = 3;
 	Auction.find({ownerId:req.user._id,ended:false}, function (err, auctions) {
 		Auction.find({ownerId:req.user._id,ended:true}, function (err, endedAuctions) {
 			Auction.find({buyerId:req.user._id,ended:true}, function (err, wonAuctions) {
 				res.render('profile', {auctions:auctions,endedAuctions:endedAuctions,wonAuctions:wonAuctions});
-			});
-		});
-	});
+			}).limit(limit).skip(skip);
+		}).limit(limit).skip(skip);
+	}).limit(limit).skip(skip);
+});
+
+router.get('/profile/wonauctionspag/', function (req, res) {
+	let skip = parseInt(req.query.skipWonAuctions) || 0;
+	let limit = 3;
+	Auction.find({buyerId:req.user._id,ended:true}, function (err, wonAuctions) {
+		if (err){
+			throw err;
+		}
+		else{
+			res.setHeader('Content-Type', 'application/json');
+		   	res.send(JSON.stringify({wonAuctions:wonAuctions}));
+		}
+	}).limit(limit).skip(skip);
+});
+
+router.get('/profile/endedauctionspag/', function (req, res) {
+	let skip = parseInt(req.query.skipEndedAuctions) || 0;
+	let limit = 3;
+	Auction.find({ownerId:req.user._id,ended:true}, function (err, endedAuctions) {
+		if (err){
+			throw err;
+		}
+		else{
+			res.setHeader('Content-Type', 'application/json');
+		   	res.send(JSON.stringify({endedAuctions:endedAuctions}));
+		}
+	}).limit(limit).skip(skip);
+});
+
+router.get('/profile/myauctionspag/', function (req, res) {
+	let skip = parseInt(req.query.skipMyAuctions) || 0;
+	let limit = 3;
+	Auction.find({ownerId:req.user._id,ended:false}, function (err, myAuctions) {
+		if (err){
+			throw err;
+		}
+		else{
+			res.setHeader('Content-Type', 'application/json');
+		   	res.send(JSON.stringify({myAuctions:myAuctions}));
+		}
+	}).limit(limit).skip(skip);
 });
 
 router.get('/editprofile', isAuthenticated, function (req, res) {
@@ -53,7 +97,7 @@ router.get('/editprofile', isAuthenticated, function (req, res) {
 router.get('/changepassword', isAuthenticated, function (req, res) {
 	res.render('changepassword');
 });
-
+//Profile edit
 router.post('/editprofile', function (req,res) {
 	var descriptionText = req.body.description;
 	if(descriptionText){
@@ -70,10 +114,11 @@ router.post('/editprofile', function (req,res) {
 		});
 	}
 });
-
+//Password changing
 router.post('/changepassword', function (req,res) {
 	var newPassword = req.body.password;
 	var oldPassword = req.body.oldPassword;
+	var validPassword;
 	req.checkBody('oldPassword', 'Old password is required').notEmpty();
 	req.checkBody('password', 'New password is required').notEmpty();
 	if(newPassword){
@@ -87,15 +132,9 @@ router.post('/changepassword', function (req,res) {
 		});
 	}
 	else{
-		var validPassword = User.checkPassword(oldPassword,req.user.password); // NIE DZIAŁA - UNDEFINED
-			console.log('valid password: '+validPassword);
-		if(!validPassword){
-			res.render('changepassword', {
-				incorrectPassword: "Invalid"
-			});
-		}
-		else{
-			console.log("zmiana");
+		validPassword = User.comparePassword(oldPassword,req.user.password, function (err, match) {
+			if (err) throw err;
+			if (match) {
 			bcrypt.genSalt(10, function(err, salt) {
 				bcrypt.hash(newPassword, salt, function(err, hash) {
 					newPassword = hash;
@@ -106,13 +145,18 @@ router.post('/changepassword', function (req,res) {
 							throw err;
 						}
 						else{
-							req.flash('success_msg', 'You successfuly changed your password');
+							req.flash('success_msg', 'You successfully changed your password');
 							res.redirect('/profile');
 						}
 					});
 				});
 			});
-		}
+			} else {
+				res.render('changepassword', {
+					incorrectPassword: "Invalid"
+				});
+			}
+		});
 	}
 });
 
@@ -229,15 +273,37 @@ router.get('/logout', function (req, res) {
 });
 
 router.get('/user/:username', function (req, res) {
+	var skip = 0;
+	var limit = 3;
 	User.findOne({ username: { "$regex": "^" + req.params.username + "\\b", "$options": "i"}}, function (err, user) {
 		if (user) {
 			Auction.find({ownerId:user._id,ended:false}, function (err, auctions) {
-					res.render('user', {auctions:auctions,user:user});
-				});
+				res.render('user', {auctions:auctions,theUser:user});
+			}).limit(limit).skip(skip);
 		}
 		else {
 			res.render('error',{ status: 404, url: req.url });
 		}	
+	});
+});
+
+router.get('/user/:username/userauctionspag/', function (req, res) {
+	let skip = parseInt(req.query.skipUserAuctions) || 0;
+	let limit = 3;
+	User.findOne({ username: { "$regex": "^" + req.params.username + "\\b", "$options": "i"}}, function (err, user) {
+		if (user) {
+			console.log(user);
+			Auction.find({ownerId:ObjectId(user._id),ended:false}, function (err, userAuctions) {
+				if (err){
+					throw err;
+				}
+				else{
+					console.log(userAuctions);
+					res.setHeader('Content-Type', 'application/json');
+		   			res.send(JSON.stringify({userAuctions:userAuctions}));
+				}
+			}).limit(limit).skip(skip);
+		}
 	});
 });
 

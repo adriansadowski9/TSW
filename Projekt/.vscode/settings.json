@@ -3,6 +3,9 @@
         "iosfwd": "c",
         "xlocbuf": "c",
         "utility": "c",
-        "mutex": "c"
+        "mutex": "c",
+        "random": "c",
+        "ios": "c",
+        "xiosbase": "c"
     }
 }

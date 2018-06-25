@@ -36,6 +36,12 @@ var AuctionSchema = mongoose.Schema({
 	},
   	ended: {
 		type: Boolean
+	},
+	allBidders: { 
+		type: [mongoose.Schema.Types.ObjectId]
+	},
+	photo: {
+		type: String
 	}
 });
 

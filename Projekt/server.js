@@ -13,12 +13,13 @@ const hbs = require('express-handlebars');
 // Passport.js
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-// Socket.io
-const socketIo = require('socket.io');
 const passportSocketIo = require('passport.socketio');
+// Jquery
+var jquery = require('jquery');
 //Mongo/Mongoose
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
+var ObjectId = require('mongodb').ObjectID;
 //Express validator
 var expressValidator = require('express-validator');
 //Flash
@@ -27,6 +28,7 @@ var flash = require('connect-flash');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.config.js');
+
 
 //Mongoose connect
 mongoose.connect('mongodb://localhost:27017/microebaydb');
@@ -38,6 +40,7 @@ db.once('open', function callback () {
 
 var users = require('./routes/users');
 var auctions = require('./routes/auctions');
+var messages = require('./routes/messages');
 
 //Express in
 const app = express();
@@ -90,7 +93,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Static folder
-app.use(express.static(path.join(__dirname + 'public')));
+app.use(express.static(path.join(__dirname + '/public')));
 
 //Handlebars view engine
 app.engine('hbs', hbs({extname: 'hbs', defaultLayout: 'layout', layoutsDir: path.join(__dirname + '/public/hbs/layouts')}));
@@ -116,6 +119,7 @@ app.route('/')
 
 app.use('/', users);
 app.use('/', auctions);
+app.use('/', messages);
 
 app.use(webpackDevMiddleware(compiler, {
   hot: true,
@@ -134,3 +138,8 @@ app.use(function (req, res) {
 const server = app.listen(4000, function() {
   console.log('App listening at port 4000');
 });
+
+const io = require('socket.io')(server);
+var Auction = require('./models/auction.js');
+var Chat = require('./models/chat.js');
+const sioServer = require('./sioserver.js')(io,Auction,ObjectId,Chat);

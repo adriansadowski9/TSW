@@ -3,6 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    {{#if user}}
+    <script src="/js/refreshPrice.js"></script>
+    <script src="/js/chat.js"></script>
+    {{/if}}
     <script src="/bundle.js" ></script>
     <title>micro eBay</title>
 </head>
@@ -23,8 +29,11 @@
             <li><a href="/auctions">Auctions</a></li>
             {{#if user}}
               <li><a href="/addauction">Add auction</a></li>
+              <li><a href="/mybids">My bids</a></li>
+              <li><a id="messagesMenu" href="/chat">Messages</a></li>
               <li><a href="/profile">Profile</a></li>
               <li><a href="/logout">Logout</a></li>
+              <b style="line-height:50px;">Hello <span id="userLogin">{{user.username}}</span></b>
             {{else}}
               <li><a href="/login">Login</a></li>
               <li><a href="/register">Register</a></li>
@@ -47,18 +56,13 @@
           {{#if error}}
             <div class="alert alert-danger" style="margin-top:20px;">{{error}}</div>
           {{/if}}
-          
+          <span id="loggedUserId" style="display:none">{{user._id}}</span>
           {{{body}}}
         </div>
 
         
         </div>
 
-        <!--<footer class="footer">
-            <div class="container">
-                <p>&copy; micro eBay - Adrian Sadowski 2018</p>
-            </div>
-        </footer>!-->
 </div>
 </body>
 </html>
