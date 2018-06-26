@@ -17,7 +17,7 @@ $("#auctionPhotoBig").click(function(){
 let skip = 6;
 $('#paginationButton').on('click', () => {
     loadMore(skip);
-    skip += 6;
+    skip += 3;
   });
 const loadMore = (skip) => {
     $.ajax({

@@ -13,7 +13,7 @@
     <p id="price-{{this._id}}" class="card-text">Price: {{this.price}}</p>
     <form method="post" action="/mybids/{{this._id}}">
         <div class="form-group">
-            <input type="text" class="form-control" value={{this.price}} style="width:150px; margin:0 auto;" name="price"><button type="submit" id="bidButton" value="{{this._id}}" class="btn btn-default" style="margin-top:5px;">Bid</button>
+            <input type="text" class="form-control" value={{this.price}} style="width:150px; margin:0 auto;" name="price"><button type="submit" id="bidButton" value="{{this._id}}" class="btn btn-default bidButton" style="margin-top:5px;">Bid</button>
         </div>
     </form>
     <a href="/auction/{{this._id}}" class="btn btn-primary">Go to auction</a>

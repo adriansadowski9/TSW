@@ -25,15 +25,27 @@ mongoose.connect(mongoURI);
 var db = mongoose.connection;
 
 
-cron.schedule('*/30 * * * * *', function(){
-	time = moment().format("Do MMMM YYYY h:mm a");
-	Auction.updateMany({ end: {$lt:time}},{$set:{ended:true}}, function(err,auctionTest){
-	});
+cron.schedule('*/20 * * * * *', function(){
+    Auction.find({ended:false},function(err,allAuctionsEnded){
+        allAuctionsEnded.forEach(function(auctionEnded){
+            time = moment().format("Do MMMM YYYY h:mm a");
+            if(moment(time,"Do MMMM YYYY h:mm a").isSameOrAfter(moment(auctionEnded.end,"Do MMMM YYYY h:mm a"))){
+                Auction.updateOne({_id:ObjectId(auctionEnded._id)},{$set:{ended:true}},function(err,auctionEndedUpdated){
+                });
+            }
+        });
+    });
 });
-cron.schedule('*/30 * * * * *', function(){
-	time = moment().format("Do MMMM YYYY h:mm a");
-	Auction.updateMany({ listedTime: {$lt:time}},{$set:{listed:true}}, function(err,auctionTest){
-	});
+cron.schedule('*/20 * * * * *', function(){
+    Auction.find({listed:false},function(err,allAuctionsListed){
+        allAuctionsListed.forEach(function(auctionListed){
+            time = moment().format("Do MMMM YYYY h:mm a");
+            if(moment(time,"Do MMMM YYYY h:mm a").isSameOrAfter(moment(auctionListed.listedTime,"Do MMMM YYYY h:mm a"))){
+                Auction.updateOne({_id:ObjectId(auctionListed._id)},{$set:{listed:true}},function(err,auctionListedUpdated){
+                });
+            }
+        });
+    });
 });
 var isAuthenticated = function(req, res, next) {
 	if (req.isAuthenticated()) {
@@ -353,7 +365,7 @@ router.post('/auction/:auctionId', function (req, res) {
 					res.redirect('/auction/'+bidAuction._id);
 					}
 				else{
-					if(newPrice <= bidAuction.price){
+					if(parseInt(newPrice) <= parseInt(bidAuction.price)){
 						req.flash('error_msg', 'Bid price must be higher than actual');
 						res.redirect('/auction/'+bidAuction._id);
 					}
@@ -421,7 +433,7 @@ router.post('/mybids/:auctionId', function (req, res) {
 					res.redirect('/mybids/');
 					}
 				else{
-					if(newPrice <= bidAuction.price){
+					if(parseInt(newPrice) <= parseInt(bidAuction.price)){
 						req.flash('error_msg', 'Bid price must be higher than actual');
 						res.redirect('/mybids/');
 					}

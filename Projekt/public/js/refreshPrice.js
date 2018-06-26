@@ -3,7 +3,7 @@ $(() => {
     let socket = io();
 
     socket.on('connect', () => {
-        $("#bidButton").click(function(){
+        $(".bidButton").click(function(){
             var id = $(this).attr("value");
             socket.emit('bid',id);
         });

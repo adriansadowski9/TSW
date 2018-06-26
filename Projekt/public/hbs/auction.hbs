@@ -32,7 +32,7 @@
              <form method="post" action="/auction/{{auction._id}}">
                  <div class="form-group"style="margin: 0 auto;text-align:center;">
                     <p id={{auction._id}}>{{#if auction.leader}}You are a leader{{else}}Someone made a higher offer{{/if}}</p>
-                    <input type="text" class="form-control" name="price" value="{{auction.price}}"style="width:150px; margin:0 auto;"> <button type="submit" value="{{auction._id}}" id="bidButton" class="btn btn-default" style="margin-top:5px;">Bid</button>
+                    <input type="text" class="form-control" name="price" value="{{auction.price}}"style="width:150px; margin:0 auto;"> <button type="submit" value="{{auction._id}}" id="bidButton" class="btn btn-default bidButton" style="margin-top:5px;">Bid</button>
                 </div>
             </form>
              {{/if}}
